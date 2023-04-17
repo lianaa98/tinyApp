@@ -10,16 +10,9 @@ const urlDatabase = {
 };
 
 // index page
-app.get("/urls", (req, res) => {
-  const templateVars = {
-    urls: urlDatabase
-  };
-  console.log(req.params);
-  res.render("urls_index", templateVars);
-});
 
 // display all urls page
-app.get("/urls/", (req, res) => {
+app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase
   };
