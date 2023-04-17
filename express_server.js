@@ -56,6 +56,20 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// redirect tinyURL to longURL
+app.get("/u/:id", (req, res) => {
+  const templateVars = {
+    id: req.params.id
+  };
+  let longURL;
+  for (let key in urlDatabase) {
+    if (templateVars.id === key) {
+      longURL = urlDatabase[key];
+    }
+  };
+  res.redirect(longURL);
+});
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}...`);
