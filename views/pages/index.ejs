@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  Hello
+</head>
+
+<body>
+  <main>
+    <div>
+      <h1>Example</h1>
+      <p>EJS</p>
+
+      <h2>Variables</h2>
+      <p>
+        <%= tagline %>
+      </p>
+      <ul>
+        <% mascots.forEach((mascot)=> {%>
+          <li>
+            <%= mascot.name %>
+              born <%= mascot.birth_year%>
+          </li>
+          <% }) %>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    Footer
+  </footer>
+
+</body>
+
+</html>

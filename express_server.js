@@ -9,25 +9,18 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// index page
 app.get("/", (req, res) => {
-  res.render("index");
-})
-
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// })
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-})
-
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`)
-})
-
-app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`)
+  const mascots = [
+    { name: "Sammy", birth_year: 2012 },
+    { name: "Tux", birth_year: 2009 },
+    { name: "Moby Duck", birth_year: 1998 },
+  ]
+  const tagline = "Example Tagline";
+  res.render("pages/index", {
+    mascots: mascots,
+    tagline: tagline
+  });
 })
 
 app.get("/urls.json", (req, res) => {
