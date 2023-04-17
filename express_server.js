@@ -10,23 +10,35 @@ const urlDatabase = {
 };
 
 // index page
-app.get("/", (req, res) => {
-  const mascots = [
-    { name: "Sammy", birth_year: 2012 },
-    { name: "Tux", birth_year: 2009 },
-    { name: "Moby Duck", birth_year: 1998 },
-  ]
-  const tagline = "Example Tagline";
-  res.render("pages/index", {
-    mascots: mascots,
-    tagline: tagline
-  });
-})
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase
+  };
+  console.log(req.params);
+  res.render("urls_index", templateVars);
+});
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-})
+// display all urls page
+app.get("/urls/", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase
+  };
+  res.render("urls_index", templateVars);
+});
+
+// display one url page
+app.get("/urls/:id", (req, res) => {
+  const templateVars = {
+    id: req.params.id
+  };
+  for (let key in urlDatabase) {
+    if (templateVars.id === key) {
+      templateVars.longURL = urlDatabase[key];
+    }
+  };
+  res.render("urls_show", templateVars);
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}...`);
-})
+});
