@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 // index page -> redirects
 app.get("/", (req, res) => {
   res.redirect("/urls");
-})
+});
 
 // display all urls page
 app.get("/urls", (req, res) => {
@@ -33,7 +33,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// get new url page
+// GET: new url page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -46,7 +46,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${tinyURL}`);
 });
 
-// display one url page
+// GET: one url page
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id
@@ -82,24 +82,33 @@ app.post("/urls/:id/delete", (req, res) => {
     id: req.params.id
   };
   for (let key in urlDatabase) {
-    if(templateVars.id === key) {
+    if (templateVars.id === key) {
       delete urlDatabase[key];
     }
   }
   res.redirect("/urls");
-})
+});
 
 // POST: update new longURL for tinyURL
 app.post("/urls/:id/update", (req, res) => {
   const templateVars = {
     newURL: req.body.newURL,
     id: req.params.id
-  }
+  };
 
   urlDatabase[templateVars.id] = templateVars.newURL;
   res.redirect("/urls");
 
-})
+});
+
+// POST: login by username
+app.post("/login", (req, res) => {
+  const templateVars ={
+    username: req.body.username
+  }
+  res.cookie("username", templateVars.username);
+  res.redirect("/urls");
+});
 
 
 app.listen(PORT, () => {
