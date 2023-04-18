@@ -20,7 +20,11 @@ function generateRandomString() {
 
 app.use(express.urlencoded({ extended: true }));
 
-// index page
+// index page -> redirects
+app.get("/", (req, res) => {
+  res.redirect("/urls");
+})
+
 // display all urls page
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -61,11 +65,9 @@ app.get("/u/:id", (req, res) => {
     id: req.params.id
   };
   let longURL;
-  console.log(templateVars);
   for (let key in urlDatabase) {
     if (templateVars.id === key) {
       longURL = urlDatabase[key];
-      console.log(longURL);
       res.redirect(longURL);
       return;
     }
@@ -74,8 +76,18 @@ app.get("/u/:id", (req, res) => {
   res.render("urls_notfound");
 });
 
-// POST: deletes url
-
+// POST: deletes url, then redirects to index
+app.post("/urls/:id/delete", (req, res) => {
+  const templateVars = {
+    id: req.params.id
+  };
+  for (let key in urlDatabase) {
+    if(templateVars.id === key) {
+      delete urlDatabase[key];
+    }
+  }
+  res.redirect("/urls");
+})
 
 
 app.listen(PORT, () => {
