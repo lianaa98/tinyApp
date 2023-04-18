@@ -40,7 +40,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     username: req.cookies.username
-  }
+  };
   res.render("urls_new", templateVars);
 });
 
@@ -111,10 +111,16 @@ app.post("/urls/:id/update", (req, res) => {
 
 // POST: login -> creates username cookie
 app.post("/login", (req, res) => {
-  const templateVars ={
+  const templateVars = {
     username: req.body.username
-  }
+  };
   res.cookie("username", templateVars.username);
+  res.redirect("/urls");
+});
+
+// POST: logout
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
   res.redirect("/urls");
 });
 
