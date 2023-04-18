@@ -68,10 +68,11 @@ app.get("/u/:id", (req, res) => {
       longURL = urlDatabase[key];
       console.log(longURL);
       res.redirect(longURL);
+      return;
     }
   };
-  // res.statusCode = 404;
-  // res.render("urls_notfound");
+  res.statusCode = 404;
+  res.render("urls_notfound");
 });
 
 

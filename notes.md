@@ -1,5 +1,5 @@
 ## Plans
-* ends request if the longURL is invalid, returns error message
+* check webcall of the longURL, make sure it's 200 before pushing to the database
 * customize the userinput field
   * https://
   * valid link?
