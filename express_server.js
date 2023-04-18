@@ -21,7 +21,6 @@ function generateRandomString() {
 app.use(express.urlencoded({ extended: true }));
 
 // index page
-
 // display all urls page
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -74,6 +73,9 @@ app.get("/u/:id", (req, res) => {
   res.statusCode = 404;
   res.render("urls_notfound");
 });
+
+// POST: deletes url
+
 
 
 app.listen(PORT, () => {

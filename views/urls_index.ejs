@@ -32,6 +32,10 @@
             <tr>
               <td><%= id %></td>
               <td><%= urls[id] %></td>
+              <td><% const deleteID = `/urls/${id}/delete` %>
+              <form method="POST" action=<%= deleteID %>> 
+                <button type="submit">DELETE</button>
+              </form></td>
             </tr>
           <% } %>
         </tbody>
