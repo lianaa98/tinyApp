@@ -13,6 +13,7 @@
   
   <body>
     <%- include("partials/_header") %>
+
     <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
@@ -23,6 +24,21 @@
       </div>
       <div class="card-footer text-muted"></div>
     </div>
+
+    <% const updateLongURL = `/urls/${id}/update` %>
+    <form class="form-inline" action=<%= updateLongURL %> method="POST">
+      <div class="form-group mb-2">
+        <label for="newURL">Update your URL destination here:</label>
+        <input
+          class="form-control"
+          type="text"
+          name="newURL"
+          placeholder="http://"
+          style="width: 300px; margin: 1em"
+        />
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

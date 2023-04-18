@@ -38,7 +38,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-// post new url page
+// POST: new url page
 app.post("/urls", (req, res) => {
   const userInput = req.body.longURL;
   const tinyURL = generateRandomString();
@@ -89,7 +89,18 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 })
 
+app.post("/urls/:id/update", (req, res) => {
+  const templateVars = {
+    newURL: req.body.newURL,
+    id: req.params.id
+  }
+
+  urlDatabase[templateVars.id] = templateVars.newURL;
+  res.redirect("/urls");
+
+})
+
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}...`);
+  console.log(`Server listening on port ${PORT}...`);
 });
