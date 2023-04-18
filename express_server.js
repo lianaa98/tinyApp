@@ -1,8 +1,11 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = 8080;
 
 app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -18,7 +21,6 @@ function generateRandomString() {
   return result;
 }
 
-app.use(express.urlencoded({ extended: true }));
 
 // index page -> redirects
 app.get("/", (req, res) => {
@@ -28,14 +30,18 @@ app.get("/", (req, res) => {
 // display all urls page
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlDatabase
+    urls: urlDatabase,
+    username: req.cookies.username
   };
   res.render("urls_index", templateVars);
 });
 
 // GET: new url page
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies.username
+  }
+  res.render("urls_new", templateVars);
 });
 
 // POST: new url page
@@ -49,7 +55,8 @@ app.post("/urls", (req, res) => {
 // GET: one url page
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
-    id: req.params.id
+    id: req.params.id,
+    username: req.cookies.username
   };
   for (let key in urlDatabase) {
     if (templateVars.id === key) {
@@ -62,7 +69,8 @@ app.get("/urls/:id", (req, res) => {
 // redirect tinyURL to longURL
 app.get("/u/:id", (req, res) => {
   const templateVars = {
-    id: req.params.id
+    id: req.params.id,
+    username: req.cookies.username,
   };
   let longURL;
   for (let key in urlDatabase) {
@@ -73,13 +81,13 @@ app.get("/u/:id", (req, res) => {
     }
   };
   res.statusCode = 404;
-  res.render("urls_notfound");
+  res.render("urls_notfound", templateVars);
 });
 
 // POST: deletes url, then redirects to index
 app.post("/urls/:id/delete", (req, res) => {
   const templateVars = {
-    id: req.params.id
+    id: req.params.id,
   };
   for (let key in urlDatabase) {
     if (templateVars.id === key) {
@@ -93,7 +101,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id/update", (req, res) => {
   const templateVars = {
     newURL: req.body.newURL,
-    id: req.params.id
+    id: req.params.id,
   };
 
   urlDatabase[templateVars.id] = templateVars.newURL;
@@ -101,7 +109,7 @@ app.post("/urls/:id/update", (req, res) => {
 
 });
 
-// POST: login by username
+// POST: login -> creates username cookie
 app.post("/login", (req, res) => {
   const templateVars ={
     username: req.body.username
