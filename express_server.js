@@ -40,7 +40,7 @@ app.post("/urls", (req, res) => {
   const userInput = req.body.longURL;
   const tinyURL = generateRandomString();
   urlDatabase[tinyURL] = userInput;
-  res.send("Added!");
+  res.redirect(`/urls/${tinyURL}`);
 });
 
 // display one url page
