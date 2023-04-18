@@ -65,9 +65,11 @@ app.get("/u/:id", (req, res) => {
   for (let key in urlDatabase) {
     if (templateVars.id === key) {
       longURL = urlDatabase[key];
+      return res.redirect(longURL);
     }
+    res.statusCode = 404;
+    res.render("urls_notfound");
   };
-  res.redirect(longURL);
 });
 
 
