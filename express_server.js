@@ -38,18 +38,22 @@ app.use(cookieSession({
   name: "session",
   keys: ['320087'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+}));
 
 // index page -> redirects
 app.get("/", (req, res) => {
+  if (!req.session.user_id) {
+    res.redirect("/login");
+    return;
+  }
   res.redirect("/urls");
 });
 
 // display all urls page
 app.get("/urls", (req, res) => {
+
   if (!req.session.user_id) {
-    console.log("current users:", users);
-    return res.send("Please log in to see your saved URLs.");
+    return res.status(403).send("Please log in to see your saved URLs.");
   }
 
   const templateVars = {
@@ -57,8 +61,6 @@ app.get("/urls", (req, res) => {
     users: users,
     user_id: req.session.user_id
   };
-
-  console.log("current users:", users);
 
   res.render("urls_index", templateVars);
 });
@@ -153,11 +155,14 @@ app.post("/urls/:id/delete", (req, res) => {
     if (url === templateVars.id) {
       delete urlDatabase[url];
       res.redirect("/urls");
+      return;
     }
   };
+
   if (urlDatabase.hasOwnProperty(templateVars.id)) {
     return res.status(400).send("This URL does not belong to you.");
   }
+
   res.statusCode = 404;
   res.send("URL does not exist.");
 });
@@ -277,12 +282,9 @@ app.post("/register", (req, res) => {
 
   // User input duplicate email
 
-  for (const user in users) {
-    if (userInputEmail === users[user].email) {
-      res.statusCode = 400;
-      res.render("register/register-fail-duplicate", templateVars);
-      return;
-    }
+  if (getUserByEmail(users, userInputEmail)) {
+    res.status(400).render("register/register-fail-duplicate", templateVars);
+    return;
   }
 
   // Happy path
