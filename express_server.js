@@ -48,6 +48,7 @@ app.get("/urls", (req, res) => {
     users: users,
     user_id: req.cookies.user_id
   };
+  console.log(users);
   res.render("urls_index", templateVars);
 });
 
@@ -127,19 +128,45 @@ app.post("/urls/:id/update", (req, res) => {
 
 });
 
-// POST: login -> creates username cookie
+app.get("/login", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    user_id: req.cookies.user_id,
+    users: users
+  };
+  res.render("login", templateVars);
+});
+
 app.post("/login", (req, res) => {
   const templateVars = {
-    username: req.body.username
+    user_id: req.cookies.user_id,
+    users: users
   };
-  res.cookie("username", templateVars.username);
-  res.redirect("/urls");
+  const userInputEmail = req.body.email;
+  const userInputPassword = req.body.password;
+  console.log(userInputEmail, userInputPassword);
+
+  for (const user in users) {
+    const email = users[user].email;
+    const password = users[user].password;
+    if (email === userInputEmail) {
+      if (password !== userInputPassword) {
+        res.statusCode = 403;
+        res.render("login-fail", templateVars);
+      }
+      res.cookie("user_id", users[user].id);
+      res.redirect("/urls");
+    }
+  }
+  res.statusCode = 403;
+  res.render("login-fail", templateVars);
+
 });
 
 // POST: logout
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // GET: render the register page
@@ -154,16 +181,31 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   const templateVars = {
-    users: users
+    users: users,
+    user_id: req.cookies.user_id,
   };
+
   const userEmail = req.body.email;
   const userPassword = req.body.password;
+
+  if (userEmail === '' || userPassword === '') {
+    res.statusCode = 400;
+    res.render("register-fail-empty", templateVars);
+  };
+
+  for (const user in users) {
+    if (userEmail === users[user].email) {
+      res.statusCode = 400;
+      res.render("register-fail-duplicate", templateVars);
+    }
+  }
   const userID = generateRandomString();
   users[userID] = {
     id: userID,
     email: userEmail,
     password: userPassword
-  }
+  };
+  console.log(users);
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });

@@ -14,10 +14,14 @@
 
     <% if (!user_id) { %>
 
-      <form class="form-inline" action="/login" method="POST">
+      <form class="form-inline" action="/register" method="GET">
         <div class="form-group">
-          <label for="username"></label>
-          <input type="text" class="form-control" name="username" placeholder="Your Username" />
+          <button type="submit" class="btn btn-primary">Sign up</button>
+        </div>
+      </form>
+
+      <form class="form-inline" action="/login" method="GET">
+        <div class="form-group">
           <button type="submit" class="btn btn-primary">Log in</button>
         </div>
       </form>
