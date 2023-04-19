@@ -32,6 +32,15 @@ const users = {
   },
 };
 
+function urlsForUser(id) {
+  const urlPairs = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      urlPairs[shortURL] = urlDatabase[shortURL].longURL;
+    }
+  }
+  return urlPairs;
+}
 
 function generateRandomString() {
   const randomStr = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -50,12 +59,15 @@ app.get("/", (req, res) => {
 
 // display all urls page
 app.get("/urls", (req, res) => {
+  if (!req.cookies.user_id) {
+    return res.send("Please log in to see your saved URLs.");
+  }
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies.user_id),
     users: users,
     user_id: req.cookies.user_id
   };
-  console.log(users);
   res.render("urls_index", templateVars);
 });
 
@@ -74,28 +86,45 @@ app.get("/urls/new", (req, res) => {
 
 // POST: new url page
 app.post("/urls", (req, res) => {
-  if(!req.cookies.user_id) {
+  if (!req.cookies.user_id) {
     return res.send("Please login to edit your url page.");
   }
   const userInput = req.body.longURL;
+  console.log("userinput:", userInput);
   const tinyURL = generateRandomString();
-  urlDatabase[tinyURL] = userInput;
+  urlDatabase[tinyURL] = {
+    longURL: userInput,
+    userID: req.cookies.user_id
+  };
+  console.log(urlDatabase);
   res.redirect(`/urls/${tinyURL}`);
 });
 
 // GET: one url page
 app.get("/urls/:id", (req, res) => {
+
+  if (!req.cookies.user_id) {
+    return res.send("Please log in to view your URL page.");
+  }
+
   const templateVars = {
     id: req.params.id,
     user_id: req.cookies.user_id,
-    users: users
+    users: users,
+    urlPairs: urlsForUser(req.cookies.user_id)
   };
-  for (let key in urlDatabase) {
-    if (templateVars.id === key) {
-      templateVars.longURL = urlDatabase[key];
+  for (const url in templateVars.urlPairs) {
+    if (url === templateVars.id) {
+      templateVars.longURL = templateVars.urlPairs[url];
+      res.render("urls_show", templateVars);
     }
   };
-  res.render("urls_show", templateVars);
+
+  if (urlDatabase.hasOwnProperty(templateVars.id)) {
+    return res.send("This URL does not belong to you.");
+  }
+  res.statusCode = 404;
+  res.send("URL does not exist.");
 });
 
 // redirect tinyURL to longURL
@@ -119,27 +148,50 @@ app.get("/u/:id", (req, res) => {
 
 // POST: deletes url, then redirects to index
 app.post("/urls/:id/delete", (req, res) => {
+  if (!req.cookies.user_id) {
+    return res.send("Please login to edit your url page.");
+  }
+
   const templateVars = {
     id: req.params.id,
+    urlPairs: urlsForUser(req.cookies.user_id)
   };
-  for (let key in urlDatabase) {
-    if (templateVars.id === key) {
-      delete urlDatabase[key];
+
+  for (const url in templateVars.urlPairs) {
+    if (url === templateVars.id) {
+      delete urlDatabase[url];
+      res.redirect("/urls");
     }
+  };
+  if (urlDatabase.hasOwnProperty(templateVars.id)) {
+    return res.send("This URL does not belong to you.");
   }
-  res.redirect("/urls");
+  res.statusCode = 404;
+  res.send("URL does not exist.");
 });
 
 // POST: update new longURL for tinyURL
 app.post("/urls/:id/update", (req, res) => {
+  if (!req.cookies.user_id) {
+    res.send("Please login to edit your url page.");
+    return;
+  }
+
   const templateVars = {
     newURL: req.body.newURL,
     id: req.params.id,
   };
 
-  urlDatabase[templateVars.id] = templateVars.newURL;
-  res.redirect("/urls");
-
+  const urlPairs = urlsForUser(req.cookies.user_id);
+  for (const url in urlPairs) {
+    if (url === templateVars.id) {
+      urlDatabase[templateVars.id].longURL = templateVars.newURL;
+      res.redirect("/urls");
+      return;
+    }
+  }
+  res.statusCode = 404;
+  res.send("Sorry, tiny URL not found.")
 });
 
 app.get("/login", (req, res) => {
