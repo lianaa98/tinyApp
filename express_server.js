@@ -1,10 +1,12 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
 const app = express();
 const PORT = 8080;
 
 app.set("view engine", "ejs");
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // body parser -> populates req.body
+app.use(morgan());
 app.use(cookieParser());
 
 const urlDatabase = {
@@ -149,7 +151,7 @@ app.get("/u/:id", (req, res) => {
 // POST: deletes url, then redirects to index
 app.post("/urls/:id/delete", (req, res) => {
   if (!req.cookies.user_id) {
-    return res.send("Please login to edit your url page.");
+    return res.status(403).send("Please login to edit your url page.");
   }
 
   const templateVars = {
@@ -164,7 +166,7 @@ app.post("/urls/:id/delete", (req, res) => {
     }
   };
   if (urlDatabase.hasOwnProperty(templateVars.id)) {
-    return res.send("This URL does not belong to you.");
+    return res.status(400).send("This URL does not belong to you.");
   }
   res.statusCode = 404;
   res.send("URL does not exist.");
@@ -173,7 +175,7 @@ app.post("/urls/:id/delete", (req, res) => {
 // POST: update new longURL for tinyURL
 app.post("/urls/:id/update", (req, res) => {
   if (!req.cookies.user_id) {
-    res.send("Please login to edit your url page.");
+    res.status(403).send("Please login to edit your url page.");
     return;
   }
 
@@ -220,16 +222,17 @@ app.post("/login", (req, res) => {
   for (const user in users) {
     const email = users[user].email;
     const password = users[user].password;
-    if (email === userInputEmail) {
-      if (password !== userInputPassword) {
+
+    if (email === userInputEmail) {             // found email
+      if (password !== userInputPassword) {     // password unmatched
         res.statusCode = 403;
         res.render("login-fail", templateVars);
-      }
+      }                                         // password matched
       res.cookie("user_id", users[user].id);
       res.redirect("/urls");
     }
   }
-  res.statusCode = 403;
+  res.statusCode = 403;                         // wrong email
   res.render("login-fail", templateVars);
 
 });
