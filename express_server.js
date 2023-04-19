@@ -8,9 +8,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.lighthouselabs.ca",
+    userID: "userRandomID",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "user2RandomID",
+  },
 };
+
 
 const users = {
   userRandomID: {
@@ -54,6 +61,10 @@ app.get("/urls", (req, res) => {
 
 // GET: new url page
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies.user_id) {   // if not logged in, go to login page
+    res.redirect("/login");
+  }
+
   const templateVars = {
     users: users,
     user_id: req.cookies.user_id
@@ -63,6 +74,9 @@ app.get("/urls/new", (req, res) => {
 
 // POST: new url page
 app.post("/urls", (req, res) => {
+  if(!req.cookies.user_id) {
+    return res.send("Please login to edit your url page.");
+  }
   const userInput = req.body.longURL;
   const tinyURL = generateRandomString();
   urlDatabase[tinyURL] = userInput;
@@ -129,6 +143,11 @@ app.post("/urls/:id/update", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+
+  if (req.cookies.user_id) {    // if logged in, redirect
+    res.redirect("/urls");
+  }
+
   const templateVars = {
     urls: urlDatabase,
     user_id: req.cookies.user_id,
@@ -163,14 +182,16 @@ app.post("/login", (req, res) => {
 
 });
 
-// POST: logout
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/login");
 });
 
-// GET: render the register page
 app.get("/register", (req, res) => {
+  if (req.cookies.user_id) {    // if logged in, redirect
+    res.redirect("/urls");
+  }
+
   const templateVars = {
     urls: urlDatabase,
     user_id: req.cookies.user_id,
