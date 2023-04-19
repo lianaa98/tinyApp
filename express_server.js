@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
+const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080;
 
@@ -24,13 +25,13 @@ const urlDatabase = {
 const users = {
   userRandomID: {
     id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    email: "a@a.com",
+    password: bcrypt.hashSync("1234", 10),
   },
   user2RandomID: {
     id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
+    email: "b@b.com",
+    password: bcrypt.hashSync("5678", 10),
   },
 };
 
@@ -193,7 +194,7 @@ app.post("/urls/:id/update", (req, res) => {
     }
   }
   res.statusCode = 404;
-  res.send("Sorry, tiny URL not found.")
+  res.send("Sorry, tiny URL not found.");
 });
 
 app.get("/login", (req, res) => {
@@ -210,30 +211,38 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", (req, res) => {      // TESTED: GOOD :)
   const templateVars = {
     user_id: req.cookies.user_id,
     users: users
   };
   const userInputEmail = req.body.email;
   const userInputPassword = req.body.password;
+
   console.log(userInputEmail, userInputPassword);
 
   for (const user in users) {
     const email = users[user].email;
     const password = users[user].password;
 
-    if (email === userInputEmail) {             // found email
-      if (password !== userInputPassword) {     // password unmatched
-        res.statusCode = 403;
-        res.render("login-fail", templateVars);
-      }                                         // password matched
-      res.cookie("user_id", users[user].id);
-      res.redirect("/urls");
+    if (email !== userInputEmail) {
+      res.statusCode = 400;
+      res.render("login/login-fail-wrongEmail", templateVars);
+      return;
+    }
+
+    if (email === userInputEmail) {
+      if (bcrypt.compareSync(userInputPassword, password)) {
+        res.cookie("user_id", users[user].id);
+        res.redirect("/urls");
+        return;
+      }                                         
+      res.statusCode = 403;
+      res.render("login/login-fail-wrongPassword", templateVars);
+      return;
     }
   }
-  res.statusCode = 403;                         // wrong email
-  res.render("login-fail", templateVars);
+
 
 });
 
