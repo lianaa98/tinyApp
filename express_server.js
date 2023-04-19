@@ -63,6 +63,8 @@ app.get("/", (req, res) => {
 // display all urls page
 app.get("/urls", (req, res) => {
   if (!req.cookies.user_id) {
+
+    console.log("current users:", users);
     return res.send("Please log in to see your saved URLs.");
   }
 
@@ -71,6 +73,9 @@ app.get("/urls", (req, res) => {
     users: users,
     user_id: req.cookies.user_id
   };
+
+  console.log("current users:", users);
+
   res.render("urls_index", templateVars);
 });
 
@@ -208,7 +213,7 @@ app.get("/login", (req, res) => {
     user_id: req.cookies.user_id,
     users: users
   };
-  res.render("login", templateVars);
+  res.render("login/login", templateVars);
 });
 
 app.post("/login", (req, res) => {      // TESTED: GOOD :)
@@ -219,31 +224,36 @@ app.post("/login", (req, res) => {      // TESTED: GOOD :)
   const userInputEmail = req.body.email;
   const userInputPassword = req.body.password;
 
+  console.log(req.body);
+
   console.log(userInputEmail, userInputPassword);
+  console.log(users);
 
   for (const user in users) {
     const email = users[user].email;
     const password = users[user].password;
 
-    if (email !== userInputEmail) {
-      res.statusCode = 400;
-      res.render("login/login-fail-wrongEmail", templateVars);
-      return;
-    }
-
+    // Correct Email
     if (email === userInputEmail) {
+
+      // Correct Password
       if (bcrypt.compareSync(userInputPassword, password)) {
         res.cookie("user_id", users[user].id);
         res.redirect("/urls");
         return;
-      }                                         
+      }
+
+      // Wrong Password
       res.statusCode = 403;
       res.render("login/login-fail-wrongPassword", templateVars);
       return;
     }
   }
 
-
+  // Wrong Email
+  res.statusCode = 400;
+  res.render("login/login-fail-wrongEmail", templateVars);
+  return;
 });
 
 app.post("/logout", (req, res) => {
@@ -261,7 +271,7 @@ app.get("/register", (req, res) => {
     user_id: req.cookies.user_id,
     users: users
   };
-  res.render("register", templateVars);
+  res.render("register/register", templateVars);
 });
 
 app.post("/register", (req, res) => {
@@ -270,25 +280,34 @@ app.post("/register", (req, res) => {
     user_id: req.cookies.user_id,
   };
 
-  const userEmail = req.body.email;
-  const userPassword = req.body.password;
+  const userInputEmail = req.body.email;
+  const userInputPassword = req.body.password;
 
-  if (userEmail === '' || userPassword === '') {
+  // User input empty strings
+
+  if (userInputEmail === '' || userInputPassword === '') {
     res.statusCode = 400;
-    res.render("register-fail-empty", templateVars);
+    res.render("register/register-fail-empty", templateVars);
+    return;
   };
 
+  // User input duplicate email
+
   for (const user in users) {
-    if (userEmail === users[user].email) {
+    if (userInputEmail === users[user].email) {
       res.statusCode = 400;
-      res.render("register-fail-duplicate", templateVars);
+      res.render("register/register-fail-duplicate", templateVars);
+      return;
     }
   }
+
+  // Happy path
+
   const userID = generateRandomString();
   users[userID] = {
     id: userID,
-    email: userEmail,
-    password: userPassword
+    email: userInputEmail,
+    password: bcrypt.hashSync(userInputPassword, 10)
   };
   console.log(users);
   res.cookie("user_id", userID);
