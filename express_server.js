@@ -5,26 +5,7 @@ const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080;
 
-app.set("view engine", "ejs");
-app.use(express.urlencoded({ extended: true })); // body parser -> populates req.body
-app.use(morgan());
-app.use(cookieSession({
-  name: "session",
-  keys: ['320087'],
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
-
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.lighthouselabs.ca",
-    userID: "userRandomID",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "user2RandomID",
-  },
-};
-
+const { getUserByEmail, urlsForUser, generateRandomString } = require('./helpers.js');
 
 const users = {
   userRandomID: {
@@ -39,8 +20,25 @@ const users = {
   },
 };
 
+const urlDatabase = {
+  b6UTxQ: {
+    longURL: "https://www.lighthouselabs.ca",
+    userID: "userRandomID",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "user2RandomID",
+  },
+};
 
-
+app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: true })); // body parser -> populates req.body
+app.use(morgan());
+app.use(cookieSession({
+  name: "session",
+  keys: ['320087'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 // index page -> redirects
 app.get("/", (req, res) => {
@@ -55,7 +53,7 @@ app.get("/urls", (req, res) => {
   }
 
   const templateVars = {
-    urls: urlsForUser(req.session.user_id),
+    urls: urlsForUser(req.session.user_id, urlDatabase),
     users: users,
     user_id: req.session.user_id
   };
@@ -105,7 +103,7 @@ app.get("/urls/:id", (req, res) => {
     id: req.params.id,
     user_id: req.session.user_id,
     users: users,
-    urlPairs: urlsForUser(req.session.user_id)
+    urlPairs: urlsForUser(req.session.user_id, urlDatabase)
   };
   for (const url in templateVars.urlPairs) {
     if (url === templateVars.id) {
@@ -148,7 +146,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
   const templateVars = {
     id: req.params.id,
-    urlPairs: urlsForUser(req.session.user_id)
+    urlPairs: urlsForUser(req.session.user_id, urlDatabase)
   };
 
   for (const url in templateVars.urlPairs) {
@@ -176,7 +174,7 @@ app.post("/urls/:id/update", (req, res) => {
     id: req.params.id,
   };
 
-  const urlPairs = urlsForUser(req.session.user_id);
+  const urlPairs = urlsForUser(req.session.user_id, urlDatabase);
   for (const url in urlPairs) {
     if (url === templateVars.id) {
       urlDatabase[templateVars.id].longURL = templateVars.newURL;

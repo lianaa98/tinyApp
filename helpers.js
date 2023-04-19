@@ -7,7 +7,7 @@ function getUserByEmail(listOfUsers, email) {
   }
 }
 
-function urlsForUser(id) {
+function urlsForUser(id, urlDatabase) {
   const urlPairs = {};
   for (const shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
