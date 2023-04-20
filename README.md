@@ -13,10 +13,10 @@ Tired of trying to copy impossibly long URLs that makes you keep scrolling down 
 
 ## Final Product
 
-!["Login page"](https://postimg.cc/2qSg1f3J)
-!["Index page"](https://postimg.cc/GBgVYSyp)
-!["Create your own URL page"](https://postimg.cc/8JF3bBRm)
-!["URL page"](https://postimg.cc/Q9RzY9SG)
+!["Login page"](https://i.postimg.cc/LstS09SH/Screenshot-2023-04-20-at-1-35-29-PM.png)
+!["Index page"](https://i.postimg.cc/RFvBkkCw/Screenshot-2023-04-20-at-1-36-57-PM.png)
+!["Create your own URL page"](https://i.postimg.cc/85wSNZs9/Screenshot-2023-04-20-at-1-37-14-PM.png)
+!["URL page"](https://i.postimg.cc/3NRHR2vR/Screenshot-2023-04-20-at-1-37-04-PM.png)
 
 ## Dependencies
 
