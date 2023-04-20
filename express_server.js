@@ -147,23 +147,21 @@ app.delete("/urls/:id", (req, res) => {
     return res.status(403).send("Please login to edit your url page.");
   }
 
-  const templateVars = {
-    id: req.params.id,
-    urlPairs: urlsForUser(req.session.user_id, urlDatabase)
-  };
+  const id = req.params.id;
 
-  for (const url in templateVars.urlPairs) {
-    if (url === templateVars.id) {
-      delete urlDatabase[url];
-      res.redirect("/urls");
-      return;
-    }
-  };
-
-  if (urlDatabase.hasOwnProperty(templateVars.id)) {
+  // check if the url belongs to user
+  if (urlDatabase[id].userID === req.session.user_id) {
+    delete urlDatabase[id];
+    res.redirect("/urls");
+    return;
+  }
+  
+  // url exists but not belong to user
+  if (urlDatabase.hasOwnProperty(id)) {
     return res.status(400).send("This URL does not belong to you.");
   }
 
+  // url does not exist
   res.statusCode = 404;
   res.send("URL does not exist.");
 });
@@ -175,21 +173,16 @@ app.put("/urls/:id", (req, res) => {
     return;
   }
 
-  const templateVars = {
-    newURL: req.body.newURL,
-    id: req.params.id,
-  };
+  const id = req.params.id;
+  const newURL = req.body.newURL;
 
-  const urlPairs = urlsForUser(req.session.user_id, urlDatabase);
-  for (const url in urlPairs) {
-    if (url === templateVars.id) {
-      urlDatabase[templateVars.id].longURL = templateVars.newURL;
-      res.redirect("/urls");
-      return;
-    }
+  if (urlDatabase[id].userID === req.session.user_id) {
+    urlDatabase[id].longURL = newURL;
+    res.redirect("/urls");
+    return;
   }
 
-  if (urlDatabase.hasOwnProperty(templateVars.id)) {
+  if (urlDatabase.hasOwnProperty(id)) {
     return res.status(403).send("This URL does not belong to you.");
   };
 
@@ -199,8 +192,9 @@ app.put("/urls/:id", (req, res) => {
 
 app.get("/login", (req, res) => {
 
-  if (req.session.user_id) {    // if logged in, redirect
+  if (req.session.user_id) {
     res.redirect("/urls");
+    return;
   }
 
   const templateVars = {
@@ -218,6 +212,12 @@ app.post("/login", (req, res) => {
   };
   const userInputEmail = req.body.email;
   const userInputPassword = req.body.password;
+
+  if (userInputEmail === '' || userInputPassword === '') {
+    res.statusCode = 400;
+    res.render("login/login-fail-empty", templateVars);
+    return;
+  };
 
   for (const user in users) {
     const email = users[user].email;
