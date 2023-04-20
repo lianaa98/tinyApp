@@ -40,7 +40,7 @@
                     </form>
                 </td>
                 <td>
-                  <% const deleteID=`/urls/${id}/delete` %>
+                  <% const deleteID=`/urls/${id}?_method=DELETE` %>
                     <form method="POST" action=<%=deleteID %>>
                       <button type="submit" class="btn btn-outline-danger">DELETE</button>
                     </form>

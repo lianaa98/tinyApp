@@ -2,6 +2,7 @@ const express = require("express");
 const cookieSession = require("cookie-session");
 const morgan = require("morgan");
 const bcrypt = require("bcryptjs");
+const methodOverride = require("method-override");
 const app = express();
 const PORT = 8080;
 
@@ -39,6 +40,7 @@ app.use(cookieSession({
   keys: ['320087'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
+app.use(methodOverride("_method"));
 
 // index page -> redirects
 app.get("/", (req, res) => {
@@ -140,8 +142,7 @@ app.get("/u/:id", (req, res) => {
   res.render("urls_notfound", templateVars);
 });
 
-// POST: deletes url, then redirects to index
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id", (req, res) => {
   if (!req.session.user_id) {
     return res.status(403).send("Please login to edit your url page.");
   }
