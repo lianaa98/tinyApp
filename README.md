@@ -13,10 +13,10 @@ Tired of trying to copy impossibly long URLs that makes you keep scrolling down 
 
 ## Final Product
 
-!["Login page"](https://i.postimg.cc/LstS09SH/Screenshot-2023-04-20-at-1-35-29-PM.png)
-!["Index page"](https://i.postimg.cc/RFvBkkCw/Screenshot-2023-04-20-at-1-36-57-PM.png)
-!["Create your own URL page"](https://i.postimg.cc/85wSNZs9/Screenshot-2023-04-20-at-1-37-14-PM.png)
-!["URL page"](https://i.postimg.cc/3NRHR2vR/Screenshot-2023-04-20-at-1-37-04-PM.png)
+!["Login page"](https://github.com/lianaa98/tinyApp/blob/main/docs/log-in-page.png?raw=true)
+!["Index page"](https://github.com/lianaa98/tinyApp/blob/main/docs/index-page.png?raw=true)
+!["Create your own URL page"](https://github.com/lianaa98/tinyApp/blob/main/docs/create-url-page.png?raw=true)
+!["URL page"](https://github.com/lianaa98/tinyApp/blob/main/docs/url-page.png?raw=true)
 
 ## Dependencies
 
