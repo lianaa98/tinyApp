@@ -69,6 +69,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   if (!req.session.user_id) {   // if not logged in, go to login page
     res.redirect("/login");
+    return;
   }
 
   const templateVars = {
@@ -81,16 +82,14 @@ app.get("/urls/new", (req, res) => {
 // POST: new url page
 app.post("/urls", (req, res) => {
   if (!req.session.user_id) {
-    return res.send("Please login to edit your url page.");
+    return res.status(403).send("Please login to edit your url page.");
   }
   const userInput = req.body.longURL;
-  console.log("userinput:", userInput);
   const tinyURL = generateRandomString();
   urlDatabase[tinyURL] = {
     longURL: userInput,
     userID: req.session.user_id
   };
-  console.log(urlDatabase);
   res.redirect(`/urls/${tinyURL}`);
 });
 
@@ -98,7 +97,7 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:id", (req, res) => {
 
   if (!req.session.user_id) {
-    return res.send("Please log in to view your URL page.");
+    return res.status(403).send("Please log in to view your URL page.");
   }
 
   const templateVars = {
@@ -111,11 +110,12 @@ app.get("/urls/:id", (req, res) => {
     if (url === templateVars.id) {
       templateVars.longURL = templateVars.urlPairs[url];
       res.render("urls_show", templateVars);
+      return;
     }
   };
 
   if (urlDatabase.hasOwnProperty(templateVars.id)) {
-    return res.send("This URL does not belong to you.");
+    return res.status(403).send("This URL does not belong to you.");
   }
   res.statusCode = 404;
   res.send("URL does not exist.");
@@ -131,7 +131,7 @@ app.get("/u/:id", (req, res) => {
   let longURL;
   for (let key in urlDatabase) {
     if (templateVars.id === key) {
-      longURL = urlDatabase[key];
+      longURL = urlDatabase[key].longURL;
       res.redirect(longURL);
       return;
     }
@@ -168,7 +168,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 // POST: update new longURL for tinyURL
-app.post("/urls/:id/update", (req, res) => {
+app.post("/urls/:id", (req, res) => {
   if (!req.session.user_id) {
     res.status(403).send("Please login to edit your url page.");
     return;
@@ -187,6 +187,11 @@ app.post("/urls/:id/update", (req, res) => {
       return;
     }
   }
+
+  if (urlDatabase.hasOwnProperty(templateVars.id)) {
+    return res.status(403).send("This URL does not belong to you.");
+  };
+
   res.statusCode = 404;
   res.send("Sorry, tiny URL not found.");
 });
@@ -205,18 +210,13 @@ app.get("/login", (req, res) => {
   res.render("login/login", templateVars);
 });
 
-app.post("/login", (req, res) => {      // TESTED: GOOD :)
+app.post("/login", (req, res) => {
   const templateVars = {
     user_id: req.session.user_id,
     users: users
   };
   const userInputEmail = req.body.email;
   const userInputPassword = req.body.password;
-
-  console.log(req.body);
-
-  console.log(userInputEmail, userInputPassword);
-  console.log(users);
 
   for (const user in users) {
     const email = users[user].email;
@@ -253,6 +253,7 @@ app.post("/logout", (req, res) => {
 app.get("/register", (req, res) => {
   if (req.session.user_id) {    // if logged in, redirect
     res.redirect("/urls");
+    return;
   }
 
   const templateVars = {
@@ -295,7 +296,6 @@ app.post("/register", (req, res) => {
     email: userInputEmail,
     password: bcrypt.hashSync(userInputPassword, 10)
   };
-  console.log(users);
   req.session.user_id = userID;
   res.redirect("/urls");
 });
