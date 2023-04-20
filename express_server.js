@@ -33,7 +33,7 @@ const urlDatabase = {
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true })); // body parser -> populates req.body
-app.use(morgan());
+app.use(morgan("dev"));
 app.use(cookieSession({
   name: "session",
   keys: ['320087'],
