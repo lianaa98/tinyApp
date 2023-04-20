@@ -3,7 +3,7 @@
 Tired of trying to copy impossibly long URLs that makes you keep scrolling down forever? TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
 
 ## Features
-* Login system
+* Login && register system
 * Create short URLs that redirects to any URL you desire!
 * Main page that displays your secret trove of URLs
 * Share-able short URL links so you can share your pizza recipes with friends!
