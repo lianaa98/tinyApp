@@ -168,8 +168,8 @@ app.delete("/urls/:id", (req, res) => {
   res.send("URL does not exist.");
 });
 
-// POST: update new longURL for tinyURL
-app.post("/urls/:id", (req, res) => {
+// PUT: update new longURL for tinyURL
+app.put("/urls/:id", (req, res) => {
   if (!req.session.user_id) {
     res.status(403).send("Please login to edit your url page.");
     return;
